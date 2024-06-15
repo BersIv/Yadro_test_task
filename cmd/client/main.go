@@ -17,7 +17,7 @@ var rootCmd = &cobra.Command{
 	Use:   "hostconfig",
 	Short: "hostconfig - edit dns and hostname",
 }
-var hostname string
+var hostname, dnsServer string
 
 var changeHostnameCmd = &cobra.Command{
 	Use:   "change-hostname",
@@ -58,6 +58,25 @@ var listDnsCmd = &cobra.Command{
 	},
 }
 
+var addDNSServer = &cobra.Command{
+	Use:   "add-dns",
+	Short: "Add new DNS server",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, conn, err := newClient()
+		if err != nil {
+			log.Fatalf("Couldn't create new channel: %v", err)
+		}
+		defer conn.Close()
+		req := &pb.AddDNSServerRequest{DnsServer: dnsServer}
+		res, err := client.AddDNSServer(context.Background(), req)
+		if err != nil {
+			log.Fatalf("Couldn't add DNS server: %v", err)
+		}
+		fmt.Printf("Response:\nstatus: %v\n", res.Status)
+
+	},
+}
+
 func newClient() (pb.HostConfigClient, *grpc.ClientConn, error) {
 	conn, err := grpc.NewClient("localhost:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -70,7 +89,9 @@ func newClient() (pb.HostConfigClient, *grpc.ClientConn, error) {
 func init() {
 	changeHostnameCmd.Flags().StringVarP(&hostname, "hostname", "n", "", "New hostname")
 	changeHostnameCmd.MarkFlagRequired("hostname")
-	rootCmd.AddCommand(changeHostnameCmd, listDnsCmd)
+	addDNSServer.Flags().StringVarP(&dnsServer, "dnsServer", "a", "", "New dns server")
+	addDNSServer.MarkFlagRequired("dnsServer")
+	rootCmd.AddCommand(changeHostnameCmd, listDnsCmd, addDNSServer)
 }
 
 func main() {

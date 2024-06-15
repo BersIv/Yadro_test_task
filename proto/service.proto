@@ -19,6 +19,13 @@ service HostConfig {
         };
     }
 
+    rpc AddDNSServer (AddDNSServerRequest) returns (AddDNSServerResponse) {
+        option (google.api.http) = {
+            post: "/dns/add"
+            body: "*"
+        };
+    }
+
 }
 
 message ChangeHostnameRequest {
@@ -36,3 +43,10 @@ message ListDNSServersResponse {
     repeated string dnsServers = 1;
 }
 
+message AddDNSServerRequest {
+    string dnsServer = 1;
+}
+
+message AddDNSServerResponse {
+    bool status = 1;
+}

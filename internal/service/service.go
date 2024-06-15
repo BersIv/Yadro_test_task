@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -43,4 +44,21 @@ func (s *Server) ListDNSServers(ctx context.Context, in *pb.ListDNSServersReques
 		}
 	}
 	return &pb.ListDNSServersResponse{DnsServers: dnsServers}, nil
+}
+
+func (s *Server) AddDNSServer(ctx context.Context, in *pb.AddDNSServerRequest) (*pb.AddDNSServerResponse, error) {
+	if in.DnsServer == "" {
+		return &pb.AddDNSServerResponse{Status: false}, errors.New("dns server cannot be empty")
+	}
+	resolvConf := "/etc/resolv.conf"
+	file, err := os.OpenFile(resolvConf, os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		return &pb.AddDNSServerResponse{Status: false}, err
+	}
+	defer file.Close()
+	if _, err := file.WriteString(fmt.Sprintf("\nnameserver %s", in.DnsServer)); err != nil {
+		return &pb.AddDNSServerResponse{Status: false}, err
+	}
+
+	return &pb.AddDNSServerResponse{Status: true}, nil
 }
