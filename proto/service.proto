@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package hostconfig;
+option go_package = "gen/go/hostconfig; hostconfig";
+
+import "google/api/annotations.proto";
+
+service HostConfig {
+    rpc ChangeHostname (ChangeHostnameRequest) returns (ChangeHostnameResponse) {
+        option (google.api.http) = {
+            post: "/hostname"
+            body: "*"
+        };
+    }
+
+    rpc ListDNSServers (ListDNSServersRequest) returns (ListDNSServersResponse) {
+        option (google.api.http) = {
+            get: "/dns"
+        };
+    }
+
+}
+
+message ChangeHostnameRequest {
+    string name = 1;
+}
+
+message ChangeHostnameResponse {
+    bool status = 1;
+    string newName = 2;
+}
+
+message ListDNSServersRequest {}
+
+message ListDNSServersResponse {
+    repeated string dnsServers = 1;
+}
+
