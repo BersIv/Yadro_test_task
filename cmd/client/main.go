@@ -17,18 +17,18 @@ var rootCmd = &cobra.Command{
 	Use:   "hostconfig",
 	Short: "hostconfig - edit dns and hostname",
 }
-var hostname, dnsServer string
 
 var changeHostnameCmd = &cobra.Command{
 	Use:   "change-hostname",
 	Short: "Change hostname",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, conn, err := newClient()
 		if err != nil {
 			log.Fatalf("Could not create new channel: %v", err)
 		}
 		defer conn.Close()
-		req := &pb.ChangeHostnameRequest{Name: hostname}
+		req := &pb.ChangeHostnameRequest{Name: args[0]}
 		res, err := client.ChangeHostname(context.Background(), req)
 		if err != nil {
 			log.Fatalf("Error setting hostname: %v", err)
@@ -40,6 +40,7 @@ var changeHostnameCmd = &cobra.Command{
 var listDnsCmd = &cobra.Command{
 	Use:   "list-dns",
 	Short: "List all DNS servers",
+	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, conn, err := newClient()
 		if err != nil {
@@ -50,6 +51,7 @@ var listDnsCmd = &cobra.Command{
 		res, err := client.ListDNSServers(context.Background(), req)
 		if err != nil {
 			log.Fatalf("Couldn't list DNS servers: %v", err)
+
 		}
 		fmt.Println("DNS servers:")
 		for _, server := range res.DnsServers {
@@ -61,19 +63,42 @@ var listDnsCmd = &cobra.Command{
 var addDNSServer = &cobra.Command{
 	Use:   "add-dns",
 	Short: "Add new DNS server",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, conn, err := newClient()
 		if err != nil {
 			log.Fatalf("Couldn't create new channel: %v", err)
 		}
 		defer conn.Close()
-		req := &pb.AddDNSServerRequest{DnsServer: dnsServer}
+		req := &pb.AddDNSServerRequest{DnsServer: args[0]}
 		res, err := client.AddDNSServer(context.Background(), req)
 		if err != nil {
 			log.Fatalf("Couldn't add DNS server: %v", err)
 		}
 		fmt.Printf("Response:\nstatus: %v\n", res.Status)
+	},
+}
 
+var removeDNSServer = &cobra.Command{
+	Use:   "remove-dns",
+	Short: "Remove DNS server",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		client, conn, err := newClient()
+		if err != nil {
+			log.Fatalf("Couldn't create new channel: %v", err)
+		}
+		defer conn.Close()
+		req := &pb.RemoveDNSServerRequest{DnsServer: args[0]}
+		res, err := client.RemoveDNSServer(context.Background(), req)
+		if err != nil {
+			log.Fatalf("Couldn't remove DNS server: %v", err)
+		}
+		fmt.Printf("Response:\nstatus: %v\n", res.Status)
+		fmt.Println("DNS servers:")
+		for _, server := range res.DnsServers {
+			fmt.Println(server)
+		}
 	},
 }
 
@@ -87,11 +112,7 @@ func newClient() (pb.HostConfigClient, *grpc.ClientConn, error) {
 }
 
 func init() {
-	changeHostnameCmd.Flags().StringVarP(&hostname, "hostname", "n", "", "New hostname")
-	changeHostnameCmd.MarkFlagRequired("hostname")
-	addDNSServer.Flags().StringVarP(&dnsServer, "dnsServer", "a", "", "New dns server")
-	addDNSServer.MarkFlagRequired("dnsServer")
-	rootCmd.AddCommand(changeHostnameCmd, listDnsCmd, addDNSServer)
+	rootCmd.AddCommand(changeHostnameCmd, listDnsCmd, addDNSServer, removeDNSServer)
 }
 
 func main() {

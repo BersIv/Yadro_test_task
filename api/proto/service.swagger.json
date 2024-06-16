@@ -70,6 +70,38 @@
         ]
       }
     },
+    "/dns/remove": {
+      "delete": {
+        "operationId": "HostConfig_RemoveDNSServer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostconfigRemoveDNSServerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/hostconfigRemoveDNSServerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HostConfig"
+        ]
+      }
+    },
     "/hostname": {
       "post": {
         "operationId": "HostConfig_ChangeHostname",
@@ -142,6 +174,28 @@
     "hostconfigListDNSServersResponse": {
       "type": "object",
       "properties": {
+        "dnsServers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hostconfigRemoveDNSServerRequest": {
+      "type": "object",
+      "properties": {
+        "dnsServer": {
+          "type": "string"
+        }
+      }
+    },
+    "hostconfigRemoveDNSServerResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean"
+        },
         "dnsServers": {
           "type": "array",
           "items": {

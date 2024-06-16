@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	HostConfig_ChangeHostname_FullMethodName = "/hostconfig.HostConfig/ChangeHostname"
-	HostConfig_ListDNSServers_FullMethodName = "/hostconfig.HostConfig/ListDNSServers"
-	HostConfig_AddDNSServer_FullMethodName   = "/hostconfig.HostConfig/AddDNSServer"
+	HostConfig_ChangeHostname_FullMethodName  = "/hostconfig.HostConfig/ChangeHostname"
+	HostConfig_ListDNSServers_FullMethodName  = "/hostconfig.HostConfig/ListDNSServers"
+	HostConfig_AddDNSServer_FullMethodName    = "/hostconfig.HostConfig/AddDNSServer"
+	HostConfig_RemoveDNSServer_FullMethodName = "/hostconfig.HostConfig/RemoveDNSServer"
 )
 
 // HostConfigClient is the client API for HostConfig service.
@@ -31,6 +32,7 @@ type HostConfigClient interface {
 	ChangeHostname(ctx context.Context, in *ChangeHostnameRequest, opts ...grpc.CallOption) (*ChangeHostnameResponse, error)
 	ListDNSServers(ctx context.Context, in *ListDNSServersRequest, opts ...grpc.CallOption) (*ListDNSServersResponse, error)
 	AddDNSServer(ctx context.Context, in *AddDNSServerRequest, opts ...grpc.CallOption) (*AddDNSServerResponse, error)
+	RemoveDNSServer(ctx context.Context, in *RemoveDNSServerRequest, opts ...grpc.CallOption) (*RemoveDNSServerResponse, error)
 }
 
 type hostConfigClient struct {
@@ -71,6 +73,16 @@ func (c *hostConfigClient) AddDNSServer(ctx context.Context, in *AddDNSServerReq
 	return out, nil
 }
 
+func (c *hostConfigClient) RemoveDNSServer(ctx context.Context, in *RemoveDNSServerRequest, opts ...grpc.CallOption) (*RemoveDNSServerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RemoveDNSServerResponse)
+	err := c.cc.Invoke(ctx, HostConfig_RemoveDNSServer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HostConfigServer is the server API for HostConfig service.
 // All implementations must embed UnimplementedHostConfigServer
 // for forward compatibility
@@ -78,6 +90,7 @@ type HostConfigServer interface {
 	ChangeHostname(context.Context, *ChangeHostnameRequest) (*ChangeHostnameResponse, error)
 	ListDNSServers(context.Context, *ListDNSServersRequest) (*ListDNSServersResponse, error)
 	AddDNSServer(context.Context, *AddDNSServerRequest) (*AddDNSServerResponse, error)
+	RemoveDNSServer(context.Context, *RemoveDNSServerRequest) (*RemoveDNSServerResponse, error)
 	mustEmbedUnimplementedHostConfigServer()
 }
 
@@ -93,6 +106,9 @@ func (UnimplementedHostConfigServer) ListDNSServers(context.Context, *ListDNSSer
 }
 func (UnimplementedHostConfigServer) AddDNSServer(context.Context, *AddDNSServerRequest) (*AddDNSServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddDNSServer not implemented")
+}
+func (UnimplementedHostConfigServer) RemoveDNSServer(context.Context, *RemoveDNSServerRequest) (*RemoveDNSServerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveDNSServer not implemented")
 }
 func (UnimplementedHostConfigServer) mustEmbedUnimplementedHostConfigServer() {}
 
@@ -161,6 +177,24 @@ func _HostConfig_AddDNSServer_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HostConfig_RemoveDNSServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveDNSServerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HostConfigServer).RemoveDNSServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HostConfig_RemoveDNSServer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HostConfigServer).RemoveDNSServer(ctx, req.(*RemoveDNSServerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HostConfig_ServiceDesc is the grpc.ServiceDesc for HostConfig service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -179,6 +213,10 @@ var HostConfig_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddDNSServer",
 			Handler:    _HostConfig_AddDNSServer_Handler,
+		},
+		{
+			MethodName: "RemoveDNSServer",
+			Handler:    _HostConfig_RemoveDNSServer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
