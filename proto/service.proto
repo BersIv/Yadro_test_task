@@ -19,6 +19,19 @@ service HostConfig {
         };
     }
 
+    rpc AddDNSServer (AddDNSServerRequest) returns (AddDNSServerResponse) {
+        option (google.api.http) = {
+            post: "/dns/add"
+            body: "*"
+        };
+    }
+
+    rpc RemoveDNSServer (RemoveDNSServerRequest) returns (RemoveDNSServerResponse) {
+        option (google.api.http) = {
+            delete: "/dns/remove"
+            body: "*"
+        };
+    }
 }
 
 message ChangeHostnameRequest {
@@ -36,3 +49,19 @@ message ListDNSServersResponse {
     repeated string dnsServers = 1;
 }
 
+message AddDNSServerRequest {
+    string dnsServer = 1;
+}
+
+message AddDNSServerResponse {
+    bool status = 1;
+}
+
+message RemoveDNSServerRequest {
+    string dnsServer = 1;
+}
+
+message RemoveDNSServerResponse {
+    bool status = 1;
+    repeated string dnsServers = 2;
+}

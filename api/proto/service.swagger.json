@@ -38,6 +38,70 @@
         ]
       }
     },
+    "/dns/add": {
+      "post": {
+        "operationId": "HostConfig_AddDNSServer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostconfigAddDNSServerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/hostconfigAddDNSServerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HostConfig"
+        ]
+      }
+    },
+    "/dns/remove": {
+      "delete": {
+        "operationId": "HostConfig_RemoveDNSServer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/hostconfigRemoveDNSServerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/hostconfigRemoveDNSServerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "HostConfig"
+        ]
+      }
+    },
     "/hostname": {
       "post": {
         "operationId": "HostConfig_ChangeHostname",
@@ -72,6 +136,22 @@
     }
   },
   "definitions": {
+    "hostconfigAddDNSServerRequest": {
+      "type": "object",
+      "properties": {
+        "dnsServer": {
+          "type": "string"
+        }
+      }
+    },
+    "hostconfigAddDNSServerResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean"
+        }
+      }
+    },
     "hostconfigChangeHostnameRequest": {
       "type": "object",
       "properties": {
@@ -94,6 +174,28 @@
     "hostconfigListDNSServersResponse": {
       "type": "object",
       "properties": {
+        "dnsServers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hostconfigRemoveDNSServerRequest": {
+      "type": "object",
+      "properties": {
+        "dnsServer": {
+          "type": "string"
+        }
+      }
+    },
+    "hostconfigRemoveDNSServerResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "boolean"
+        },
         "dnsServers": {
           "type": "array",
           "items": {
